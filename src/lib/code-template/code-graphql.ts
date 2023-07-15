@@ -4,8 +4,8 @@ import { pascalCase } from '../utils/helper';
 
 const notColumn = [
   'id',
-  'created_at',
-  'updated_at',
+  // 'created_at',
+  // 'updated_at',
   'deleted_at',
   'created_user',
   'updated_user',
@@ -13,7 +13,7 @@ const notColumn = [
   'updated_id',
   'deleted_id',
   'i18n',
-  'enable_flage',
+  'enable_flag',
 ];
 
 const findTypeTxt = (p: IQueryColumnOut): string => {

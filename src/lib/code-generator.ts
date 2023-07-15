@@ -388,7 +388,8 @@ const createFile = async (
     return;
   }
   // 文件名
-  const fileName = tableName.replace(/_/g, '-');
+  // const fileName = tableName.replace(/_/g, '-');
+  const fileName = tableName;
 
   const objath = get(fileObj, 'path', `./out/${type}`);
   const filePath = isString(objath) ? objath : objath(tableName);

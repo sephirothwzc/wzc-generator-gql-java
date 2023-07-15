@@ -51,7 +51,7 @@ $ git push -u origin --tags
 ```json
 {
   "scripts":{
-    "code": "node ./node_modules/wzc-generator-nestjs/dist/index.js"
+    "code": "node ./node_modules/wzc-generator-gql-java/dist/index.js"
   }
 }
 ```
