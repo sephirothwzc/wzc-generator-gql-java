@@ -3,13 +3,14 @@ import { get, isString } from 'lodash';
 import shell from 'shelljs';
 import { Sequelize } from 'sequelize-typescript';
 import { QueryTypes } from 'sequelize';
-import { send as modelSend } from './code-template/code-sequelize-model';
-import { send as serviceSend } from './code-template/code-service';
-import { send as resolverSend } from './code-template/code-resolver';
-import { send as objectTypeSend } from './code-template/code-object-type';
-import { send as createInputTypeSend } from './code-template/code-create-input-type';
-import { send as updateInputTypeSend } from './code-template/code-update-input-type';
-import { send as saveInputTypeSend } from './code-template/code-save-input-type';
+// import { send as modelSend } from './code-template/code-sequelize-model';
+// import { send as serviceSend } from './code-template/code-service';
+// import { send as resolverSend } from './code-template/code-resolver';
+// import { send as objectTypeSend } from './code-template/code-object-type';
+// import { send as createInputTypeSend } from './code-template/code-create-input-type';
+// import { send as updateInputTypeSend } from './code-template/code-update-input-type';
+// import { send as saveInputTypeSend } from './code-template/code-save-input-type';
+import { send as graphqlSend } from './code-template/code-graphql';
 import fs from 'fs';
 import { promisify } from 'util';
 import bluebird from 'bluebird';
@@ -140,40 +141,46 @@ const getConn = (config: ISequelizeConfig): Sequelize => {
  * 生成类型
  */
 const codeTypeArray = [
-  'sequelizeModel',
-  'nestjsService',
+  // 'sequelizeModel',
+  // 'nestjsService',
   // 'typeGraphql',
   // 'operation',
-  'nestjsResolver',
-  'objectTypeSend',
-  'createInputTypeSend',
-  'updateInputTypeSend',
-  'saveInputTypeSend',
+  // 'nestjsResolver',
+  // 'objectTypeSend',
+  // 'createInputTypeSend',
+  // 'updateInputTypeSend',
+  // 'saveInputTypeSend',
   // 'service',
   // 'gql-react',
   // 'react-antd-list',
   // 'react-antd-item',
+  'graphql',
 ];
 
 /**
  * 生成对象
  */
 const allFun = {
-  sequelizeModel: {
-    fun: modelSend,
-    /**
-     * 路径
-     */
-    path: `./src/model/customer`,
-    /**
-     * 前缀
-     */
-    suffix: `model`,
-    /**
-     * 扩展名 可以为空默认 ts
-     */
-    extension: 'ts',
+  graphql: {
+    fun: graphqlSend,
+    path: `./src/main/resources/graphql`,
+    extension: 'gql',
   },
+  // sequelizeModel: {
+  //   fun: modelSend,
+  //   /**
+  //    * 路径
+  //    */
+  //   path: `./src/model/customer`,
+  //   /**
+  //    * 前缀
+  //    */
+  //   suffix: `model`,
+  //   /**
+  //    * 扩展名 可以为空默认 ts
+  //    */
+  //   extension: 'ts',
+  // },
   // typeGraphql: {
   //   fun: typeGraphqlSend,
   //   path: (tableName: string) => {
@@ -182,14 +189,14 @@ const allFun = {
   //   },
   //   suffix: 'gql',
   // },
-  nestjsService: {
-    fun: serviceSend,
-    path: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `./src/${fileName}`;
-    },
-    suffix: 'service',
-  },
+  // nestjsService: {
+  //   fun: serviceSend,
+  //   path: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `./src/${fileName}`;
+  //   },
+  //   suffix: 'service',
+  // },
   // operation: {
   //   fun: operationSend,
   //   path: (tableName: string) => {
@@ -199,58 +206,58 @@ const allFun = {
   //   extension: 'gql',
   //   fileName: 'operation',
   // },
-  nestjsResolver: {
-    fun: resolverSend,
-    path: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `./src/${fileName}`;
-    },
-    suffix: 'resolver',
-  },
-  objectTypeSend: {
-    fun: objectTypeSend,
-    path: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `./src/${fileName}/entities`;
-    },
-    suffix: 'entity',
-  },
-  createInputTypeSend: {
-    fun: createInputTypeSend,
-    path: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `./src/${fileName}/dto`;
-    },
-    suffix: 'input',
-    fileName: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `create-${fileName}`;
-    },
-  },
-  updateInputTypeSend: {
-    fun: updateInputTypeSend,
-    path: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `./src/${fileName}/dto`;
-    },
-    suffix: 'input',
-    fileName: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `update-${fileName}`;
-    },
-  },
-  saveInputTypeSend: {
-    fun: saveInputTypeSend,
-    path: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `./src/${fileName}/dto`;
-    },
-    suffix: 'input',
-    fileName: (tableName: string) => {
-      const fileName = tableName.replace(/_/g, '-');
-      return `save-${fileName}`;
-    },
-  },
+  // nestjsResolver: {
+  //   fun: resolverSend,
+  //   path: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `./src/${fileName}`;
+  //   },
+  //   suffix: 'resolver',
+  // },
+  // objectTypeSend: {
+  //   fun: objectTypeSend,
+  //   path: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `./src/${fileName}/entities`;
+  //   },
+  //   suffix: 'entity',
+  // },
+  // createInputTypeSend: {
+  //   fun: createInputTypeSend,
+  //   path: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `./src/${fileName}/dto`;
+  //   },
+  //   suffix: 'input',
+  //   fileName: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `create-${fileName}`;
+  //   },
+  // },
+  // updateInputTypeSend: {
+  //   fun: updateInputTypeSend,
+  //   path: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `./src/${fileName}/dto`;
+  //   },
+  //   suffix: 'input',
+  //   fileName: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `update-${fileName}`;
+  //   },
+  // },
+  // saveInputTypeSend: {
+  //   fun: saveInputTypeSend,
+  //   path: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `./src/${fileName}/dto`;
+  //   },
+  //   suffix: 'input',
+  //   fileName: (tableName: string) => {
+  //     const fileName = tableName.replace(/_/g, '-');
+  //     return `save-${fileName}`;
+  //   },
+  // },
   // 'gql-react': {
   //   fun: reactGql,
   //   path: (tableName: string) => {
@@ -287,7 +294,7 @@ const allFun = {
  */
 const envConfig = (env: string): ISequelizeConfig => {
   // 判断是否midway config存在
-  const configPath = './database/config.json';
+  const configPath = './code-generator/config.json';
   console.log(chalk.white.red.bold(`===========ENV[${env}]============`));
   try {
     const dbConfig = shell.cat(configPath);
