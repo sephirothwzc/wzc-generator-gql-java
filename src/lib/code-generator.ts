@@ -169,6 +169,7 @@ const codeTypeArray = [
   // 'react-antd-list',
   // 'react-antd-item',
   'graphql',
+  'controllerResolvers',
 ];
 
 /**
