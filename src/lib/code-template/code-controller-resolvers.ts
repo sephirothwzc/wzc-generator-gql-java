@@ -61,13 +61,13 @@ import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`
         return this.${camelCase(p.tableName)}Service.list(lambdaQueryWrapper);
     }`;
         } else {
-          // 声明引入对象 services
-          txtImport.add(
-            `import ${java?.packageName}.service.impl.${pascalCase(
-              p.referencedTableName
-            )}ServiceImpl;`
-          );
-          txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
+          // // 声明引入对象 services
+          // txtImport.add(
+          //   `import ${java?.packageName}.service.impl.${pascalCase(
+          //     p.referencedTableName
+          //   )}ServiceImpl;`
+          // );
+          // txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
 
           // 非自我关联 增加 inject
           injectService.add(
