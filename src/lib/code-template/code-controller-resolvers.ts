@@ -103,8 +103,7 @@ ${hasManyTemp}`;
         // 子表 b
         if (p.referencedTableName !== p.tableName) {
           txtImport.add(
-            `import ${java?.packageName}.service.impl.${pascalCase(p.tableName)}ServiceImpl;
-import ${java?.packageName}.model.${pascalCase(p.tableName)};`
+            `import ${java?.packageName}.service.impl.${pascalCase(p.tableName)}ServiceImpl;`
           );
           txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
 
