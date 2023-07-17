@@ -3,7 +3,7 @@ import { IQueryColumnOut, IQueryKeyColumnOut, IQueryTableOut, ISend } from '../c
 import { pascalCase } from '../utils/helper';
 
 const notColumn = [
-  'id',
+  // 'id',
   // 'created_at',
   // 'updated_at',
   'deleted_at',
