@@ -57,22 +57,21 @@ const findForeignKey = (
   const otherColumns = keyColumnList
     .map((p) => {
       if (p.tableName === tableItem.tableName) {
-        let hasManyTemp = '';
         // 自我关联
         if (p.referencedTableName === tableItem.tableName) {
-          hasManyTemp = `
-    # Parent
+          return `
+    # Parent-${p.refTableComment}
     ${camelCase(p.tableName)}${pascalCase(p.columnName)}: ${pascalCase(p.tableName)}`;
         }
+        // 非自我关联
         // 当前表为子表 外键 BelongsTo
         return `
-    # ${camelCase(p.columnName)}
-    ${camelCase(p.referencedTableName)}${inputCol}: ${pascalCase(p.referencedTableName)}
-${hasManyTemp}`;
+    # ${camelCase(p.columnName)}-${p.refTableComment}
+    ${camelCase(p.referencedTableName)}${inputCol}: ${pascalCase(p.referencedTableName)}`;
       } else {
         // 当前表为主表 主键 Hasmany
         return `
-    # ${pascalCase(p.columnName)}
+    # ${pascalCase(p.columnName)}-${p.refTableComment}
     ${camelCase(p.tableName)}${inputCol}Array: ${pascalCase(p.tableName)}
   `;
       }
@@ -86,7 +85,7 @@ ${hasManyTemp}`;
       const propertyName = camelCase(p.columnName);
       const comment = p.columnComment || p.columnName;
 
-      const gqlNullable = p.isNullable === 'YES' ? '!' : '';
+      const gqlNullable = p.isNullable === 'YES' ? '' : '!';
       return `
     # ${comment}
     ${propertyName}: ${gqlType}${gqlNullable}
@@ -105,15 +104,19 @@ const modelTemplate = ({
   className,
   columns,
   otherColumns,
+  tableComment,
 }: {
   className: string;
   columns: string;
   otherColumns: string;
+  tableComment: string;
 }) => {
-  return `type ${className} {
+  return `# ${tableComment}
+type ${className} {
 ${columns}${otherColumns}
 }
 
+# 分页 ${tableComment}
 type Page${className} implements PageType{
     # 页面行数
     size: Long
@@ -123,31 +126,32 @@ type Page${className} implements PageType{
     records: [${className}]
 }
 
+# 保存 ${tableComment}
 input Save${className}Input {
 ${columns}
 }
 
 extend type Query {
-    # id 获取对象
+    # id 获取-${tableComment}
     find${className}(id:String!):${className}
-    # 条件排序获取列表
+    # 条件排序获取列表-${tableComment}
     findAll${className}(queryWrapper: JSON,orderBy:[[String!]]) : [${className}]
-    # 行数
+    # 行数-${tableComment}
     findCount${className}(queryWrapper: JSON): Long!
-    # 分页
+    # 分页-${tableComment}
     findPage${className}(findInput:FindInput): Page${className}
 }
 
 extend type Mutation {
-    # 创建 返回 id
+    # 创建 返回 id-${tableComment}
     save${className}(param: Save${className}Input!): String
-    # 更新 or 插入 根据id
+    # 更新 or 插入 根据id-${tableComment}
     upset${className}(param:Save${className}Input!): ${className}
-    # 有条件更新
+    # 有条件更新-${tableComment}
     upsetWrapper${className}(param:Save${className}Input!,wrapper: JSON): Boolean
-    # 批量插入
+    # 批量插入-${tableComment}
     saveBatch${className}(param:[Save${className}Input!]!): Boolean
-    # 根据id删除
+    # 根据id删除-${tableComment}
     remove${className}(id:String!): Boolean
 }
 `;
@@ -159,5 +163,6 @@ export const send = ({ columnList, tableItem, keyColumnList }: ISend) => {
     className: pascalCase(tableItem.tableName),
     columns,
     otherColumns,
+    tableComment: tableItem.tableComment,
   });
 };

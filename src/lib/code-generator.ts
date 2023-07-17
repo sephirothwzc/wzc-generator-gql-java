@@ -11,15 +11,22 @@ import { QueryTypes } from 'sequelize';
 // import { send as updateInputTypeSend } from './code-template/code-update-input-type';
 // import { send as saveInputTypeSend } from './code-template/code-save-input-type';
 import { send as graphqlSend } from './code-template/code-graphql';
+import { send as controllerResolversSend } from './code-template/code-controller-resolvers';
 import fs from 'fs';
 import { promisify } from 'util';
 import bluebird from 'bluebird';
 import inquirer from 'inquirer';
+import { pascalCase } from './utils/helper';
 
 // inquirer.registerPrompt('checkbox-plus', require('inquirer-checkbox-plus-prompt'));
 
+export type JavaPage = {
+  packageName?: string;
+};
+
 // #region interface
 export interface ISend {
+  java?: JavaPage;
   columnList: Array<IQueryColumnOut>;
   tableItem: IQueryTableOut;
   keyColumnList: Array<IQueryKeyColumnOut>;
@@ -36,6 +43,7 @@ export interface ISequelizeConfig {
   username: string;
   password: string;
   dialect: any;
+  java?: JavaPage;
 }
 
 export interface IQueryTableOut {
@@ -74,6 +82,10 @@ export interface IQueryKeyColumnOut {
    */
   tableComment: string;
   /**
+   * 表注释
+   */
+  refTableComment: string;
+  /**
    * 约束更新规则
    */
   updateRule: string;
@@ -101,15 +113,17 @@ export interface IFileObject {
     columnList,
     tableItem,
     keyColumnList,
+    java,
   }: {
     columnList: Array<IQueryColumnOut>;
     tableItem: IQueryTableOut;
     keyColumnList: Array<IQueryKeyColumnOut>;
+    java?: JavaPage;
   }) => Promise<string>;
   /**
    * 自定义文件扩展方法
    */
-  path: string | ((tableName: string) => string);
+  path: string | ((tableName: string, config?: ISequelizeConfig) => string);
   /**
    * 后缀
    */
@@ -165,6 +179,19 @@ const allFun = {
     fun: graphqlSend,
     path: `./src/main/resources/graphql`,
     extension: 'gql',
+  },
+  controllerResolvers: {
+    fun: controllerResolversSend,
+    path: (tableName: string, config?: ISequelizeConfig) => {
+      console.log(tableName);
+      let pname = config?.java?.packageName?.replace(/./g, '/');
+      return `./src/main/java/${pname}/resolvers`;
+    },
+    fileName: (tableName: string) => {
+      const fileName = pascalCase(tableName);
+      return fileName;
+    },
+    extension: 'java',
   },
   // sequelizeModel: {
   //   fun: modelSend,
@@ -368,8 +395,13 @@ const fileSend = async (tables: [IQueryTableOut], types: [string], config: ISequ
       await bluebird.each(types, async (x) => {
         // 生成文件
         const fileObj: IFileObject = await get(allFun, x);
-        const codeStr = await fileObj.fun({ columnList, tableItem: p, keyColumnList });
-        codeStr && (await createFile(fileObj, p.tableName, codeStr, x));
+        const codeStr = await fileObj.fun({
+          columnList,
+          tableItem: p,
+          keyColumnList,
+          java: config.java,
+        });
+        codeStr && (await createFile(fileObj, p.tableName, codeStr, x, config));
       });
     }));
 };
@@ -382,7 +414,8 @@ const createFile = async (
   fileObj: IFileObject,
   tableName: string,
   txt: string,
-  type: string
+  type: string,
+  config: ISequelizeConfig
 ): Promise<void> => {
   if (!txt) {
     return;
@@ -392,7 +425,7 @@ const createFile = async (
   const fileName = tableName;
 
   const objath = get(fileObj, 'path', `./out/${type}`);
-  const filePath = isString(objath) ? objath : objath(tableName);
+  const filePath = isString(objath) ? objath : objath(tableName, config);
   console.log(filePath);
   shell.mkdir('-p', filePath);
   // 最终文件名处理
@@ -507,6 +540,7 @@ const queryKeyColumn = async (
            C.COLUMN_NAME as columnName,
            C.CONSTRAINT_NAME as constraintName,
            T.TABLE_COMMENT as tableComment,
+					 refT.TABLE_COMMENT as refTableComment,
            R.UPDATE_RULE as updateRule,
            R.DELETE_RULE as deleteRule
       FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE C
@@ -516,7 +550,9 @@ const queryKeyColumn = async (
         ON R.TABLE_NAME = C.TABLE_NAME
        AND R.CONSTRAINT_NAME = C.CONSTRAINT_NAME
        AND R.REFERENCED_TABLE_NAME = C.REFERENCED_TABLE_NAME
-      WHERE C.REFERENCED_TABLE_NAME IS NOT NULL 
+			join INFORMATION_SCHEMA. TABLES refT
+				on reft.TABLE_NAME = C.REFERENCED_TABLE_NAME 
+      WHERE C.REFERENCED_TABLE_NAME IS NOT NULL
 				AND (C.REFERENCED_TABLE_NAME = :tableName or C.TABLE_NAME = :tableName)
         AND C.TABLE_SCHEMA = :database
         group by C.CONSTRAINT_NAME order by C.CONSTRAINT_NAME`;
