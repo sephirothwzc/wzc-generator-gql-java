@@ -189,7 +189,7 @@ const allFun = {
       }
       console.log(config.java.packageName);
       console.log(tableName);
-      let pname = config?.java?.packageName?.replace(/./g, `/`);
+      let pname = config?.java?.packageName?.replace(/\./g, `/`);
       console.log(pname);
       return `./src/main/java/${pname}/resolvers`;
     },
