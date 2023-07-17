@@ -28,8 +28,7 @@ const findForeignKey = (
           txtImport.add(
             `import ${java?.packageName}.service.impl.${pascalCase(
               p.referencedTableName
-            )}ServiceImpl;
-import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`
+            )}ServiceImpl;`
           );
           txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
         }
