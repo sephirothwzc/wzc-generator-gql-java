@@ -187,6 +187,7 @@ const allFun = {
       if (!config?.java?.packageName) {
         throw new Error('config.java.packageName is null');
       }
+      console.log(config.java.packageName);
       console.log(tableName);
       let pname = config?.java?.packageName?.replace(/./g, `/`);
       console.log(pname);
