@@ -69,7 +69,10 @@ import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`
 
           // 非自我关联 增加 inject
           injectService.add(
-            `private ${pascalCase(p.referencedTableName)}ServiceImpl ${camelCase(
+            `    /**
+     * ${p.refTableComment}
+     */
+    private ${pascalCase(p.referencedTableName)}ServiceImpl ${camelCase(
               p.referencedTableName
             )}Service;`
           );
@@ -89,9 +92,9 @@ import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`
         var lambdaQueryWrapper = JsonToWrapper.toQueryWrapper(environment, ${pascalCase(
           p.referencedTableName
         )}.class).lambda();
-        lambdaQueryWrapper.eq(${pascalCase(p.referencedTableName)}::get${camelCase(
-          p.columnName
-        )}, ${camelCase(tableItem.tableName)}.getId());
+        lambdaQueryWrapper.eq(${pascalCase(p.referencedTableName)}::getId, ${camelCase(
+          tableItem.tableName
+        )}.${camelCase(p.columnName)}());
         return this.${camelCase(p.referencedTableName)}Service.getOne(lambdaQueryWrapper);
     }
 ${hasManyTemp}`;
@@ -106,7 +109,10 @@ import ${java?.packageName}.model.${pascalCase(p.tableName)};`
 
           // 非自我关联 增加 inject
           injectService.add(
-            `private ${pascalCase(p.tableName)}ServiceImpl ${camelCase(p.tableName)}Service;`
+            `    /**
+     * ${p.tableComment}
+     */
+    private ${pascalCase(p.tableName)}ServiceImpl ${camelCase(p.tableName)}Service;`
           );
         }
 
