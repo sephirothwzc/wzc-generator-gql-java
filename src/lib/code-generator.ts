@@ -184,12 +184,15 @@ const allFun = {
   controllerResolvers: {
     fun: controllerResolversSend,
     path: (tableName: string, config?: ISequelizeConfig) => {
+      if (config?.java?.packageName) {
+        throw new Error('config.java.packageName is null');
+      }
       console.log(tableName);
       let pname = config?.java?.packageName?.replace(/./g, '/');
       return `./src/main/java/${pname}/resolvers`;
     },
     fileName: (tableName: string) => {
-      const fileName = pascalCase(tableName);
+      const fileName = pascalCase(tableName) + 'Resolvers';
       return fileName;
     },
     extension: 'java',

@@ -34,8 +34,7 @@ import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`
 
         if (p.referencedTableName === tableItem.tableName) {
           // 自我关联-不需要引入
-          hasManyTemp = `
-    /**
+          hasManyTemp = `    /**
      * ${pascalCase(tableItem.tableName)}-list: ${tableItem.tableComment}
      *
      * @param queryWrapper
@@ -113,7 +112,7 @@ import ${java?.packageName}.model.${pascalCase(p.tableName)};`
 
         // 主表 主键 Hasmany
         return `    /**
-     * 子表list
+     * ${pascalCase(p.tableName)}: ${p.tableComment}
      *
      * @param queryWrapper
      * @param orderBy
@@ -145,19 +144,21 @@ const modelTemplate = ({
   filedResolver,
   importFiled,
   injectService,
+  java,
 }: {
   className: string;
   filedResolver: string;
   importFiled: string;
   injectService: string;
+  java?: JavaPage;
 }) => {
-  return `package com.example.flexible_operation.resolvers;
+  return `package ${java?.packageName}.resolvers;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.flexible_operation.graphqlutil.FindInput;
-import com.example.flexible_operation.graphqlutil.JsonToWrapper;
-import com.example.flexible_operation.model.${className};${importFiled}
-import com.example.flexible_operation.service.impl.${className}ServiceImpl;${injectService}
+import ${java?.packageName}.graphqlutil.FindInput;
+import ${java?.packageName}.graphqlutil.JsonToWrapper;
+import ${java?.packageName}.model.${className};${importFiled}
+import ${java?.packageName}.service.impl.${className}ServiceImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.AllArgsConstructor;
@@ -255,5 +256,6 @@ export const send = ({ java, tableItem, keyColumnList }: ISend) => {
     filedResolver,
     importFiled: Array.from(importFiled).join(''),
     injectService: Array.from(injectService).join(','),
+    java,
   });
 };
