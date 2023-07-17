@@ -163,8 +163,7 @@ const modelTemplate = ({
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${java?.packageName}.graphqlutil.FindInput;
 import ${java?.packageName}.graphqlutil.JsonToWrapper;
-import ${java?.packageName}.model.${className};${importFiled}
-import ${java?.packageName}.service.impl.${className}ServiceImpl;
+${importFiled}
 import com.fasterxml.jackson.databind.JsonNode;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.AllArgsConstructor;
