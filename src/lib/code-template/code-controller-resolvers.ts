@@ -94,7 +94,7 @@ import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`
         )}.class).lambda();
         lambdaQueryWrapper.eq(${pascalCase(p.referencedTableName)}::getId, ${camelCase(
           tableItem.tableName
-        )}.${camelCase(p.columnName)}());
+        )}.get${pascalCase(p.columnName)}());
         return this.${camelCase(p.referencedTableName)}Service.getOne(lambdaQueryWrapper);
     }
 ${hasManyTemp}`;
@@ -245,9 +245,9 @@ public class ${className}Resolvers {
     }
     // endregion
 
-   // region property
-   ${filedResolver}
-   // endregion
+    // region property
+${filedResolver}
+    // endregion
 }`;
 };
 
