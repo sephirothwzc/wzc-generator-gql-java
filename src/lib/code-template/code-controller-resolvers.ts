@@ -20,7 +20,10 @@ const findForeignKey = (
     .map((p) => {
       if (p.tableName === tableItem.tableName) {
         // 子表是当前表
-        if (p.referencedTableName !== p.tableName) {
+        if (
+          p.referencedTableName !== p.tableName &&
+          p.referencedTableName !== tableItem.tableName
+        ) {
           // 非 自我关联的 需要引入父类相关对象（services、model）
           txtImport.add(
             `import ${java?.packageName}.service.impl.${pascalCase(
@@ -163,7 +166,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${java?.packageName}.graphqlutil.FindInput;
 import ${java?.packageName}.graphqlutil.JsonToWrapper;
 import ${java?.packageName}.model.${className};
+// region import
 ${importFiled}
+// endregion
 import ${java?.packageName}.service.impl.${className}ServiceImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import graphql.schema.DataFetchingEnvironment;
@@ -260,7 +265,8 @@ export const send = ({ java, tableItem, keyColumnList }: ISend) => {
   return modelTemplate({
     className: pascalCase(tableItem.tableName),
     filedResolver,
-    importFiled: Array.from(importFiled).join(''),
+    importFiled: Array.from(importFiled).join(`
+`),
     injectService: Array.from(injectService).join(','),
     java,
   });
