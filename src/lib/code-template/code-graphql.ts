@@ -72,7 +72,9 @@ const findForeignKey = (
         // 当前表为主表 主键 Hasmany
         return `
     # ${pascalCase(p.columnName)}-${p.refTableComment}
-    ${camelCase(p.tableName)}${inputCol}Array: ${pascalCase(p.tableName)}
+    ${camelCase(
+      p.tableName
+    )}${inputCol}Array(queryWrapper: JSON,orderBy:[[String!]]): [${pascalCase(p.tableName)}]
   `;
       }
     })
