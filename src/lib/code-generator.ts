@@ -184,7 +184,7 @@ const allFun = {
   controllerResolvers: {
     fun: controllerResolversSend,
     path: (tableName: string, config?: ISequelizeConfig) => {
-      if (config?.java?.packageName) {
+      if (!config?.java?.packageName) {
         throw new Error('config.java.packageName is null');
       }
       console.log(tableName);
