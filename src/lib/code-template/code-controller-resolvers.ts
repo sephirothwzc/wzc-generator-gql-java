@@ -105,7 +105,7 @@ ${hasManyTemp}`;
           txtImport.add(
             `import ${java?.packageName}.service.impl.${pascalCase(p.tableName)}ServiceImpl;`
           );
-          txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
+          txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.tableName)};`);
 
           // 非自我关联 增加 inject
           injectService.add(
