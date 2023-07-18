@@ -561,7 +561,8 @@ const queryKeyColumn = async (
       WHERE C.REFERENCED_TABLE_NAME IS NOT NULL
 				AND (C.REFERENCED_TABLE_NAME = :tableName or C.TABLE_NAME = :tableName)
         AND C.TABLE_SCHEMA = :database
-        group by C.CONSTRAINT_NAME order by C.CONSTRAINT_NAME`;
+        -- group by C.CONSTRAINT_NAME 
+        order by C.CONSTRAINT_NAME`;
   const sequelize = getConn(config);
   const result = await sequelize.query<IQueryKeyColumnOut>(sql, {
     replacements: {
