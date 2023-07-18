@@ -132,7 +132,9 @@ ${hasManyTemp}`;
         )}Array(@Argument(name = "queryWrapper") JsonNode queryWrapper, @Argument(name = "orderBy") List<List<String>> orderBy, ${pascalCase(
           tableItem.tableName
         )} ${camelCase(tableItem.tableName)}, DataFetchingEnvironment environment) {
-        var lambdaQueryWrapper = JsonToWrapper.toQueryWrapper(queryWrapper, orderBy, environment, DataDictionaryItem.class).lambda();
+        var lambdaQueryWrapper = JsonToWrapper.toQueryWrapper(queryWrapper, orderBy, environment, ${pascalCase(
+          tableItem.tableName
+        )}.class).lambda();
         lambdaQueryWrapper.eq(${pascalCase(p.tableName)}::get${pascalCase(
           p.columnName
         )}, ${camelCase(tableItem.tableName)}.getId());
