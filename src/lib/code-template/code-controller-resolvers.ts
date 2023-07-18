@@ -122,7 +122,7 @@ ${hasManyTemp}`;
      *
      * @param queryWrapper
      * @param orderBy
-     * @param dataDictionaryTitle
+     * @param ${camelCase(tableItem.tableName)}
      * @param environment
      * @return
      */
@@ -135,7 +135,7 @@ ${hasManyTemp}`;
         var lambdaQueryWrapper = JsonToWrapper.toQueryWrapper(queryWrapper, orderBy, environment, DataDictionaryItem.class).lambda();
         lambdaQueryWrapper.eq(${pascalCase(p.tableName)}::get${pascalCase(
           p.columnName
-        )}, dataDictionaryTitle.getId());
+        )}, ${camelCase(tableItem.tableName)}.getId());
         return this.${camelCase(p.tableName)}Service.list(lambdaQueryWrapper);
     }
 `;
@@ -217,7 +217,7 @@ public class ${className}Resolvers {
     }
     // endregion
 
-    // regioin mutation
+    // region mutation
     @MutationMapping
     public String save${className}(@Argument("param") ${className} param) {
         this.${camelCase(className)}Service.save(param);
