@@ -168,7 +168,12 @@ import java.util.stream.Collectors;`);
         }`;
     })
     .join(``);
-  return [columns, Array.from(injectService).join(''), listCreateColumns];
+  return [
+    columns,
+    Array.from(injectService).join(`
+`),
+    listCreateColumns,
+  ];
 };
 
 const modelTemplate = ({
