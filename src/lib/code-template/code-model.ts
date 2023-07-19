@@ -8,10 +8,15 @@ import {
 } from '../code-generator';
 import { pascalCase } from '../utils/helper';
 
+/**
+ * 全局引用需要清空
+ */
+const importList = new Set<string>();
+
 const notColumn = [
-  // 'id',
-  // 'created_at',
-  // 'updated_at',
+  'id',
+  'created_at',
+  'updated_at',
   'deleted_at',
   'created_user',
   'updated_user',
@@ -30,6 +35,8 @@ const findTypeTxt = (p: IQueryColumnOut): string => {
       return 'String';
     case 'timestamp': // GraphQLTimestamp
     case 'datetime':
+      importList.add(`
+import java.time.LocalDateTime;`);
       return 'LocalDateTime';
     case 'int':
       return 'Int';
@@ -57,9 +64,7 @@ const findForeignKey = (
   columnList: IQueryColumnOut[],
   tableItem: IQueryTableOut,
   keyColumnList: IQueryKeyColumnOut[]
-): [string, string, string] => {
-  const otherImport = new Set<string>();
-
+): [string, string] => {
   const normalColumns = columnList
     .filter((p) => !notColumn.includes(p.columnName))
     .map((p) => {
@@ -78,9 +83,9 @@ const findForeignKey = (
   const listCreateColumns = keyColumnList
     .filter((p) => p.tableName !== tableItem.tableName)
     .map((p) => {
-      otherImport.add(`
+      importList.add(`
 import java.util.List;`);
-      otherImport.add(`
+      importList.add(`
 import com.baomidou.mybatisplus.annotation.TableField;`);
       // 主表 主键 Hasmany
       return `
@@ -91,7 +96,7 @@ import com.baomidou.mybatisplus.annotation.TableField;`);
     private List<${pascalCase(p.tableName)}> ${camelCase(p.tableName)}Array;`;
     })
     .join(``);
-  return [normalColumns, listCreateColumns, Array.from(otherImport).join('')];
+  return [normalColumns, listCreateColumns];
 };
 
 const modelTemplate = ({
@@ -100,18 +105,16 @@ const modelTemplate = ({
   columns,
   java,
   listCreateColumns,
-  otherImport,
 }: {
   tableName: string;
   className: string;
   columns: string;
   java?: JavaPage;
   listCreateColumns: string;
-  otherImport: string;
 }) => {
+  const importStr = Array.from(importList).join(``);
   return `package ${java?.packageName}.model;
-${otherImport}
-import com.baomidou.mybatisplus.annotation.TableField;
+${importStr}
 import com.baomidou.mybatisplus.annotation.TableName;
 import ${java?.packageName}.base.BaseModel;
 import lombok.AllArgsConstructor;
@@ -134,17 +137,15 @@ ${listCreateColumns}
 };
 
 export const send = ({ columnList, java, tableItem, keyColumnList }: ISend) => {
-  const [columns, listCreateColumns, otherImport] = findForeignKey(
-    columnList,
-    tableItem,
-    keyColumnList
-  );
+  // 初始化清空
+  importList.clear();
+
+  const [columns, listCreateColumns] = findForeignKey(columnList, tableItem, keyColumnList);
   return modelTemplate({
     tableName: tableItem.tableName,
     className: pascalCase(tableItem.tableName),
     columns,
     listCreateColumns,
     java,
-    otherImport,
   });
 };
