@@ -171,7 +171,7 @@ const codeTypeArray = [
   // 'react-antd-item',
   'graphql',
   'controllerResolvers',
-  'model',
+  'javaModel',
 ];
 
 /**
