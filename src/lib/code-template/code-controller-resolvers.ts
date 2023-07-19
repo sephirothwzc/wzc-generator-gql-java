@@ -3,6 +3,11 @@ import { IQueryKeyColumnOut, IQueryTableOut, ISend, JavaPage } from '../code-gen
 import { pascalCase } from '../utils/helper';
 
 /**
+ * 全局引用需要清空
+ */
+const importList = new Set<string>();
+
+/**
  * 根据key生成主外建对象 增加 import
  * @param tableItem
  * @param keyColumnList
@@ -13,9 +18,7 @@ const findForeignKey = (
   tableItem: IQueryTableOut,
   keyColumnList: IQueryKeyColumnOut[],
   java?: JavaPage
-): [string, Set<string>, Set<string>, string, string] => {
-  const txtImport = new Set<string>();
-  const otherImport = new Set<string>();
+): [string, string, string] => {
   const injectService = new Set<string>();
   const columns = keyColumnList
     .map((p) => {
@@ -26,12 +29,12 @@ const findForeignKey = (
           p.referencedTableName !== tableItem.tableName
         ) {
           // 非 自我关联的 需要引入父类相关对象（services、model）
-          txtImport.add(
+          importList.add(
             `import ${java?.packageName}.service.impl.${pascalCase(
               p.referencedTableName
             )}ServiceImpl;`
           );
-          txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
+          importList.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
         }
         let hasManyTemp = '';
 
@@ -103,10 +106,10 @@ ${hasManyTemp}`;
       } else {
         // 子表 b
         if (p.referencedTableName !== p.tableName) {
-          txtImport.add(
+          importList.add(
             `import ${java?.packageName}.service.impl.${pascalCase(p.tableName)}ServiceImpl;`
           );
-          txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.tableName)};`);
+          importList.add(`import ${java?.packageName}.model.${pascalCase(p.tableName)};`);
 
           // 非自我关联 增加 inject
           injectService.add(
@@ -134,7 +137,7 @@ ${hasManyTemp}`;
           tableItem.tableName
         )} ${camelCase(tableItem.tableName)}, DataFetchingEnvironment environment) {
         var lambdaQueryWrapper = JsonToWrapper.toQueryWrapper(queryWrapper, orderBy, environment, ${pascalCase(
-          tableItem.tableName
+          p.tableName
         )}.class).lambda();
         lambdaQueryWrapper.eq(${pascalCase(p.tableName)}::get${pascalCase(
           p.columnName
@@ -149,8 +152,10 @@ ${hasManyTemp}`;
   const listCreateColumns = keyColumnList
     .filter((p) => p.tableName !== tableItem.tableName)
     .map((p) => {
-      otherImport.add(`
+      importList.add(`
 import cn.hutool.core.util.ArrayUtil;`);
+      importList.add(`
+import java.util.stream.Collectors;`);
       // 主表 主键 Hasmany
       return `
         // ${p.tableComment}
@@ -163,7 +168,7 @@ import cn.hutool.core.util.ArrayUtil;`);
         }`;
     })
     .join(``);
-  return [columns, txtImport, injectService, listCreateColumns, Array.from(otherImport).join('')];
+  return [columns, Array.from(injectService).join(''), listCreateColumns];
 };
 
 const modelTemplate = ({
@@ -173,7 +178,6 @@ const modelTemplate = ({
   injectService,
   java,
   listCreateColumns,
-  otherImport,
 }: {
   className: string;
   filedResolver: string;
@@ -181,10 +185,9 @@ const modelTemplate = ({
   injectService: string;
   java?: JavaPage;
   listCreateColumns: string;
-  otherImport: string;
 }) => {
   return `package ${java?.packageName}.resolvers;
-${otherImport}
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${java?.packageName}.graphqlutil.FindInput;
 import ${java?.packageName}.graphqlutil.JsonToWrapper;
@@ -287,16 +290,20 @@ ${filedResolver}
 };
 
 export const send = ({ java, tableItem, keyColumnList }: ISend) => {
-  const [filedResolver, importFiled, injectService, listCreateColumns, otherImport] =
-    findForeignKey(tableItem, keyColumnList, java);
+  // 初始化清空
+  importList.clear();
+
+  const [filedResolver, injectService, listCreateColumns] = findForeignKey(
+    tableItem,
+    keyColumnList,
+    java
+  );
   return modelTemplate({
     className: pascalCase(tableItem.tableName),
     filedResolver,
-    importFiled: Array.from(importFiled).join(`
-`),
-    injectService: Array.from(injectService).join(','),
+    importFiled: Array.from(importList).join(``),
+    injectService: injectService,
     java,
     listCreateColumns,
-    otherImport,
   });
 };

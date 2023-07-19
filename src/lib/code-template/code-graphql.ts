@@ -89,7 +89,7 @@ const findForeignKey = (
       // 当前表为主表 主键 Hasmany
       return `
     # ${pascalCase(p.columnName)}-${p.tableComment}
-    ${camelCase(p.tableName)}${inputCol}Array: [${pascalCase(p.tableName)}!]
+    ${camelCase(p.tableName)}${inputCol}Array: [Save${pascalCase(p.tableName)}Input!]
   `;
     })
     .join(``);
@@ -146,8 +146,13 @@ type Page${className} implements PageType{
 
 # 保存 ${tableComment}
 input Save${className}Input {
+${columns}
+}
+
+input Create${className}Input {
 ${columns}${inputOtherColumns}
 }
+
 
 extend type Query {
     # id 获取-${tableComment}
