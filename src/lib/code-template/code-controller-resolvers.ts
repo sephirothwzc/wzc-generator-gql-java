@@ -13,8 +13,9 @@ const findForeignKey = (
   tableItem: IQueryTableOut,
   keyColumnList: IQueryKeyColumnOut[],
   java?: JavaPage
-): [string, Set<string>, Set<string>] => {
+): [string, Set<string>, Set<string>, string, string] => {
   const txtImport = new Set<string>();
+  const otherImport = new Set<string>();
   const injectService = new Set<string>();
   const columns = keyColumnList
     .map((p) => {
@@ -144,7 +145,25 @@ ${hasManyTemp}`;
       }
     })
     .join(``);
-  return [columns, txtImport, injectService];
+
+  const listCreateColumns = keyColumnList
+    .filter((p) => p.tableName !== tableItem.tableName)
+    .map((p) => {
+      otherImport.add(`
+import cn.hutool.core.util.ArrayUtil;`);
+      // 主表 主键 Hasmany
+      return `
+        // ${p.tableComment}
+        if (ArrayUtil.isNotEmpty(param.get${pascalCase(p.tableName)}Array())) {
+            var list = param.get${pascalCase(p.tableName)}Array().stream().map(p -> {
+                p.set${pascalCase(p.columnName)}(param.getId());
+                return p;
+            }).collect(Collectors.toList());
+            this.${camelCase(p.tableName)}Service.saveBatch(list);
+        }`;
+    })
+    .join(``);
+  return [columns, txtImport, injectService, listCreateColumns, Array.from(otherImport).join('')];
 };
 
 const modelTemplate = ({
@@ -153,15 +172,19 @@ const modelTemplate = ({
   importFiled,
   injectService,
   java,
+  listCreateColumns,
+  otherImport,
 }: {
   className: string;
   filedResolver: string;
   importFiled: string;
   injectService: string;
   java?: JavaPage;
+  listCreateColumns: string;
+  otherImport: string;
 }) => {
   return `package ${java?.packageName}.resolvers;
-
+${otherImport}
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${java?.packageName}.graphqlutil.FindInput;
 import ${java?.packageName}.graphqlutil.JsonToWrapper;
@@ -221,6 +244,13 @@ public class ${className}Resolvers {
 
     // region mutation
     @MutationMapping
+    public String createDataDictionaryTitle(@Argument("param") DataDictionaryTitle param) {
+        this.dataDictionaryTitleService.save(param);
+        ${listCreateColumns}
+        return param.getId();
+    }
+
+    @MutationMapping
     public String save${className}(@Argument("param") ${className} param) {
         this.${camelCase(className)}Service.save(param);
         return param.getId();
@@ -257,11 +287,8 @@ ${filedResolver}
 };
 
 export const send = ({ java, tableItem, keyColumnList }: ISend) => {
-  const [filedResolver, importFiled, injectService] = findForeignKey(
-    tableItem,
-    keyColumnList,
-    java
-  );
+  const [filedResolver, importFiled, injectService, listCreateColumns, otherImport] =
+    findForeignKey(tableItem, keyColumnList, java);
   return modelTemplate({
     className: pascalCase(tableItem.tableName),
     filedResolver,
@@ -269,5 +296,7 @@ export const send = ({ java, tableItem, keyColumnList }: ISend) => {
 `),
     injectService: Array.from(injectService).join(','),
     java,
+    listCreateColumns,
+    otherImport,
   });
 };

@@ -12,6 +12,7 @@ import { QueryTypes } from 'sequelize';
 // import { send as saveInputTypeSend } from './code-template/code-save-input-type';
 import { send as graphqlSend } from './code-template/code-graphql';
 import { send as controllerResolversSend } from './code-template/code-controller-resolvers';
+import { send as codeModelSend } from './code-template/code-model';
 import fs from 'fs';
 import { promisify } from 'util';
 import bluebird from 'bluebird';
@@ -170,6 +171,7 @@ const codeTypeArray = [
   // 'react-antd-item',
   'graphql',
   'controllerResolvers',
+  'model',
 ];
 
 /**
@@ -195,6 +197,24 @@ const allFun = {
     },
     fileName: (tableName: string) => {
       const fileName = pascalCase(tableName) + 'Resolvers';
+      return fileName;
+    },
+    extension: 'java',
+  },
+  javaModel: {
+    fun: codeModelSend,
+    path: (tableName: string, config?: ISequelizeConfig) => {
+      if (!config?.java?.packageName) {
+        throw new Error('config.java.packageName is null');
+      }
+      console.log(config.java.packageName);
+      console.log(tableName);
+      let pname = config?.java?.packageName?.replace(/\./g, `/`);
+      console.log(pname);
+      return `./src/main/java/${pname}/model`;
+    },
+    fileName: (tableName: string) => {
+      const fileName = pascalCase(tableName);
       return fileName;
     },
     extension: 'java',

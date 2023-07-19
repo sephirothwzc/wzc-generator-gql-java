@@ -51,7 +51,7 @@ const findForeignKey = (
   tableItem: IQueryTableOut,
   keyColumnList: IQueryKeyColumnOut[],
   inputCol = ''
-): [string, string] => {
+): [string, string, string] => {
   // const txtImport = new Set<string>();
   // const injectService = new Set<string>();
   const otherColumns = keyColumnList
@@ -80,6 +80,20 @@ const findForeignKey = (
     })
     .join(``);
 
+  /**
+   * input 保存 子表list
+   */
+  const inputOtherColumns = keyColumnList
+    .filter((p) => p.tableName !== tableItem.tableName)
+    .map((p) => {
+      // 当前表为主表 主键 Hasmany
+      return `
+    # ${pascalCase(p.columnName)}-${p.tableComment}
+    ${camelCase(p.tableName)}${inputCol}Array: [${pascalCase(p.tableName)}!]
+  `;
+    })
+    .join(``);
+
   const normal = columnList
     .filter((p) => !notColumn.includes(p.columnName))
     .map((p) => {
@@ -94,7 +108,7 @@ const findForeignKey = (
 `;
     })
     .join('');
-  return [normal, otherColumns];
+  return [normal, otherColumns, inputOtherColumns];
 };
 
 /**
@@ -107,11 +121,13 @@ const modelTemplate = ({
   columns,
   otherColumns,
   tableComment,
+  inputOtherColumns,
 }: {
   className: string;
   columns: string;
   otherColumns: string;
   tableComment: string;
+  inputOtherColumns: string;
 }) => {
   return `# ${tableComment}
 type ${className} {
@@ -130,7 +146,7 @@ type Page${className} implements PageType{
 
 # 保存 ${tableComment}
 input Save${className}Input {
-${columns}
+${columns}${inputOtherColumns}
 }
 
 extend type Query {
@@ -145,6 +161,8 @@ extend type Query {
 }
 
 extend type Mutation {
+    # 主子表新增
+    create${className}(param: Create${className}Input): String
     # 创建 返回 id-${tableComment}
     save${className}(param: Save${className}Input!): String
     # 更新 or 插入 根据id-${tableComment}
@@ -160,11 +178,16 @@ extend type Mutation {
 };
 
 export const send = ({ columnList, tableItem, keyColumnList }: ISend) => {
-  const [columns, otherColumns] = findForeignKey(columnList, tableItem, keyColumnList);
+  const [columns, otherColumns, inputOtherColumns] = findForeignKey(
+    columnList,
+    tableItem,
+    keyColumnList
+  );
   return modelTemplate({
     className: pascalCase(tableItem.tableName),
     columns,
     otherColumns,
     tableComment: tableItem.tableComment,
+    inputOtherColumns,
   });
 };
