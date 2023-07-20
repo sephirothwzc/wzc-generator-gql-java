@@ -252,8 +252,8 @@ public class ${className}Resolvers {
 
     // region mutation
     @MutationMapping
-    public String createDataDictionaryTitle(@Argument("param") DataDictionaryTitle param) {
-        this.dataDictionaryTitleService.save(param);
+    public String create${className}(@Argument("param") ${className} param) {
+        this.${camelCase(className)}Service.save(param);
         ${listCreateColumns}
         return param.getId();
     }

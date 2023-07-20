@@ -39,7 +39,7 @@ const findTypeTxt = (p: IQueryColumnOut): string => {
 import java.time.LocalDateTime;`);
       return 'LocalDateTime';
     case 'int':
-      return 'Int';
+      return 'Integer';
     case 'decimal':
     case 'double':
       return 'Float';
