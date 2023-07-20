@@ -495,6 +495,7 @@ const fileWritePromise = (fullPath: string, txt: string) => {
 
   const fsWriteFile = promisify(fs.writeFile);
   return fsWriteFile(fullPath, txt);
+  // return fsWriteFile(fullPath, txt, { encoding: 'utf-8' });
 };
 
 export const init = async (config: InitInProp) => {
