@@ -153,6 +153,10 @@ input Create${className}Input {
 ${columns}${inputOtherColumns}
 }
 
+input Upset${className}Input {
+${columns.replace(/!/g, '')}${inputOtherColumns}
+}
+
 
 extend type Query {
     # id 获取-${tableComment}
@@ -171,9 +175,9 @@ extend type Mutation {
     # 创建 返回 id-${tableComment}
     save${className}(param: Save${className}Input!): String
     # 更新 or 插入 根据id-${tableComment}
-    upset${className}(param:Save${className}Input!): ${className}
+    upset${className}(param:Upset${className}Input!): ${className}
     # 有条件更新-${tableComment}
-    upsetWrapper${className}(param:Save${className}Input!,wrapper: JSON): Boolean
+    upsetWrapper${className}(param:Upset${className}Input!,wrapper: JSON): Boolean
     # 批量插入-${tableComment}
     saveBatch${className}(param:[Save${className}Input!]!): Boolean
     # 根据id删除-${tableComment}
