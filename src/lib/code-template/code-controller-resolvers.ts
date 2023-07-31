@@ -63,15 +63,10 @@ const findForeignKey = (
           )}, ${camelCase(p.tableName)}.getId());
         return this.${camelCase(p.tableName)}Service.list(lambdaQueryWrapper);
     }`;
-        } else if (p.tableName !== tableItem.tableName) {
-          // // 声明引入对象 services
-          // txtImport.add(
-          //   `import ${java?.packageName}.service.impl.${pascalCase(
-          //     p.referencedTableName
-          //   )}ServiceImpl;`
-          // );
-          // txtImport.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
-
+        } else if (
+          p.tableName !== tableItem.tableName ||
+          p.referencedTableName !== tableItem.tableName
+        ) {
           // 非自我关联 增加 inject
           injectService.add(
             `    
@@ -83,10 +78,11 @@ const findForeignKey = (
             )}Service;`
           );
         }
+
         // 子表 外键 BelongsTo
         return `    
     /**
-     * 自我关联 parent -${pascalCase(p.referencedTableName)} : ${p.refTableComment}
+     * 非自我关联 parent -${pascalCase(p.referencedTableName)} : ${p.refTableComment}
      *
      * @param ${camelCase(tableItem.tableName)}
      * @param environment
@@ -220,7 +216,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ${className}Resolvers {
 
-    private ${className}ServiceImpl ${camelCase(className)}Service;${injectService}
+    private ${className}ServiceImpl ${camelCase(className)}Service;
+    ${injectService}
 
     // region query
     @QueryMapping
@@ -308,7 +305,8 @@ export const send = ({ java, tableItem, keyColumnList }: ISend) => {
   return modelTemplate({
     className: pascalCase(tableItem.tableName),
     filedResolver,
-    importFiled: Array.from(importList).join(``),
+    importFiled: Array.from(importList).join(`
+`),
     injectService: injectService,
     java,
     listCreateColumns,
