@@ -81,7 +81,9 @@ const findForeignKey = (
     .join('');
 
   const listCreateColumns = keyColumnList
-    .filter((p) => p.tableName !== tableItem.tableName)
+    .filter(
+      (p) => p.tableName !== tableItem.tableName || p.referencedTableName === tableItem.tableName
+    )
     .map((p) => {
       importList.add(`
 import java.util.List;`);
