@@ -60,8 +60,10 @@ const findForeignKey = (
         // 自我关联
         if (p.referencedTableName === tableItem.tableName) {
           return `
-    # Parent-${p.refTableComment}
-    ${camelCase(p.tableName)}${pascalCase(p.columnName)}: ${pascalCase(p.tableName)}`;
+    # children-${p.refTableComment}
+    ${camelCase(p.tableName)}${pascalCase(
+            p.columnName
+          )}Array(queryWrapper: JSON,orderBy:[[String!]]): [${pascalCase(p.tableName)}]`;
         }
         // 非自我关联
         // 当前表为子表 外键 BelongsTo
@@ -154,7 +156,7 @@ ${columns}${inputOtherColumns}
 }
 
 input Upset${className}Input {
-${columns.replace(/!/g, '')}${inputOtherColumns}
+${columns.replace(/!/g, '')}
 }
 
 

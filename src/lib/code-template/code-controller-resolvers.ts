@@ -63,7 +63,7 @@ const findForeignKey = (
           )}, ${camelCase(p.tableName)}.getId());
         return this.${camelCase(p.tableName)}Service.list(lambdaQueryWrapper);
     }`;
-        } else {
+        } else if (p.tableName !== tableItem.tableName) {
           // // 声明引入对象 services
           // txtImport.add(
           //   `import ${java?.packageName}.service.impl.${pascalCase(
@@ -74,7 +74,8 @@ const findForeignKey = (
 
           // 非自我关联 增加 inject
           injectService.add(
-            `    /**
+            `    
+    /**
      * ${p.refTableComment}
      */
     private ${pascalCase(p.referencedTableName)}ServiceImpl ${camelCase(
