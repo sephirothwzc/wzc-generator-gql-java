@@ -41,7 +41,7 @@ const findForeignKey = (
         if (p.referencedTableName === tableItem.tableName) {
           // 自我关联-不需要引入
           hasManyTemp = `    /**
-     * ${pascalCase(tableItem.tableName)}-list: ${tableItem.tableComment}
+     * 自我关联 ${pascalCase(tableItem.tableName)}-list: ${tableItem.tableComment}
      *
      * @param queryWrapper
      * @param orderBy
@@ -59,7 +59,7 @@ const findForeignKey = (
           tableItem.tableName
         )}.class).lambda();
         lambdaQueryWrapper.eq(${pascalCase(p.tableName)}::get${pascalCase(
-            p.columnName
+            p.referencedColumnName
           )}, ${camelCase(p.tableName)}.getId());
         return this.${camelCase(p.tableName)}Service.list(lambdaQueryWrapper);
     }`;
@@ -84,8 +84,9 @@ const findForeignKey = (
           );
         }
         // 子表 外键 BelongsTo
-        return `    /**
-     * parent-${pascalCase(p.referencedTableName)} : ${p.refTableComment}
+        return `    
+    /**
+     * 自我关联 parent -${pascalCase(p.referencedTableName)} : ${p.refTableComment}
      *
      * @param ${camelCase(tableItem.tableName)}
      * @param environment
@@ -123,7 +124,7 @@ ${hasManyTemp}`;
 
         // 主表 主键 Hasmany
         return `    /**
-     * ${pascalCase(p.tableName)}: ${p.tableComment}
+     * 主表 主键 Hasmany ${pascalCase(p.tableName)}: ${p.tableComment}
      *
      * @param queryWrapper
      * @param orderBy
