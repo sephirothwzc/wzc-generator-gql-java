@@ -148,7 +148,7 @@ type Page${className} implements PageType{
 
 # 保存 ${tableComment}
 input Save${className}Input {
-${columns}
+${columns.replace('id: String!', 'id: String')}
 }
 
 input Create${className}Input {
