@@ -152,7 +152,7 @@ ${columns}
 }
 
 input Create${className}Input {
-${columns}${inputOtherColumns}
+${columns.replace('id: String!', 'id: String')}${inputOtherColumns}
 }
 
 input Upset${className}Input {
