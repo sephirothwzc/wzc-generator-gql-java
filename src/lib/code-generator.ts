@@ -23,6 +23,10 @@ import { pascalCase } from './utils/helper';
 
 export type JavaPage = {
   packageName?: string;
+  /**
+   * 自定义配置目录用于分项目包使用
+   */
+  usePath?: string;
 };
 
 // #region interface
@@ -180,8 +184,13 @@ const codeTypeArray = [
 const allFun = {
   graphql: {
     fun: graphqlSend,
-    path: `./src/main/resources/graphql`,
+    // path: `./src/main/resources/graphql`,
     extension: 'gql',
+    path: (tableName: string, config?: ISequelizeConfig) => {
+      console.log(tableName);
+      const upath = (config?.java?.usePath || '').replace(/\./g, `/`);
+      return `.${upath}/src/main/resources/graphql`;
+    },
   },
   controllerResolvers: {
     fun: controllerResolversSend,
@@ -193,7 +202,8 @@ const allFun = {
       console.log(tableName);
       let pname = config?.java?.packageName?.replace(/\./g, `/`);
       console.log(pname);
-      return `./src/main/java/${pname}/resolvers`;
+      const upath = (config?.java?.usePath || '').replace(/\./g, `/`);
+      return `.${upath}/src/main/java/${pname}/resolvers`;
     },
     fileName: (tableName: string) => {
       const fileName = pascalCase(tableName) + 'Resolvers';
@@ -211,7 +221,8 @@ const allFun = {
       console.log(tableName);
       let pname = config?.java?.packageName?.replace(/\./g, `/`);
       console.log(pname);
-      return `./src/main/java/${pname}/model`;
+      const upath = (config?.java?.usePath || '').replace(/\./g, `/`);
+      return `.${upath}/src/main/java/${pname}/model`;
     },
     fileName: (tableName: string) => {
       const fileName = pascalCase(tableName);
