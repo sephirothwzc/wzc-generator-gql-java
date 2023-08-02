@@ -173,7 +173,7 @@ extend type Query {
 
 extend type Mutation {
     # 主子表新增
-    create${className}(param: Create${className}Input): String
+    create${className}(param: Create${className}Input): ${className}
     # 创建 返回 id-${tableComment}
     save${className}(param: Save${className}Input!): String
     # 更新 or 插入 根据id-${tableComment}
