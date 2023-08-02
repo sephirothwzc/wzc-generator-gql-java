@@ -115,10 +115,10 @@ const modelTemplate = ({
   listCreateColumns: string;
 }) => {
   const importStr = Array.from(importList).join(``);
-  return `package ${java?.packageName}.model;
+  return `package ${java?.packageName}${java?.modelPackage}.model;
 ${importStr}
 import com.baomidou.mybatisplus.annotation.TableName;
-import ${java?.packageName}.base.BaseModel;
+import ${java?.packageName}${java?.modelPackage}.base.BaseModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -27,6 +27,10 @@ export type JavaPage = {
    * 自定义配置目录用于分项目包使用
    */
   usePath?: string;
+  /**
+   * model 自定义包名
+   */
+  modelPackage?: string;
 };
 
 // #region interface

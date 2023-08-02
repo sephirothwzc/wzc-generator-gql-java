@@ -34,7 +34,11 @@ const findForeignKey = (
               p.referencedTableName
             )}ServiceImpl;`
           );
-          importList.add(`import ${java?.packageName}.model.${pascalCase(p.referencedTableName)};`);
+          importList.add(
+            `import ${java?.packageName}${java?.modelPackage}.model.${pascalCase(
+              p.referencedTableName
+            )};`
+          );
         }
         let hasManyTemp = '';
 
@@ -107,7 +111,9 @@ ${hasManyTemp}`;
           importList.add(
             `import ${java?.packageName}.service.impl.${pascalCase(p.tableName)}ServiceImpl;`
           );
-          importList.add(`import ${java?.packageName}.model.${pascalCase(p.tableName)};`);
+          importList.add(
+            `import ${java?.packageName}${java?.modelPackage}.model.${pascalCase(p.tableName)};`
+          );
 
           // 非自我关联 增加 inject
           injectService.add(
@@ -194,7 +200,7 @@ const modelTemplate = ({
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${java?.packageName}.graphqlutil.FindInput;
 import ${java?.packageName}.graphqlutil.JsonToWrapper;
-import ${java?.packageName}.model.${className};
+import ${java?.packageName}${java?.modelPackage}.model.${className};
 // region import
 ${importFiled}
 // endregion
