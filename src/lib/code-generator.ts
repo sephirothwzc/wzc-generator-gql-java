@@ -227,7 +227,7 @@ const allFun = {
       console.log(pname);
       const upath = (config?.java?.usePath || '').replace(/\./g, `/`);
       const upath2 = (config?.java?.modelPackage || '').replace(/\./g, `/`);
-      return `.${upath}${upath2}/src/main/java/${pname}/model`;
+      return `.${upath}/src/main/java/${pname}${upath2}/model`;
     },
     fileName: (tableName: string) => {
       const fileName = pascalCase(tableName);
