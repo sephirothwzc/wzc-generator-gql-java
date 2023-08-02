@@ -28,7 +28,7 @@ export type JavaPage = {
    */
   usePath?: string;
   /**
-   * model 自定义包名
+   * model 自定义包名 .api
    */
   modelPackage?: string;
 };

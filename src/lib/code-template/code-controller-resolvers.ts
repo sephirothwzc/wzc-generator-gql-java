@@ -56,7 +56,7 @@ const findForeignKey = (
     @SchemaMapping
     public List<${pascalCase(tableItem.tableName)}> ${camelCase(p.tableName)}${pascalCase(
             p.columnName
-          )}Array (@Argument(name = "queryWrapper") JsonNode queryWrapper, @Argument(name = "orderBy") List<List<String>> orderBy, ${pascalCase(
+          )}Array(@Argument(name = "queryWrapper") JsonNode queryWrapper, @Argument(name = "orderBy") List<List<String>> orderBy, ${pascalCase(
             tableItem.tableName
           )} ${camelCase(p.tableName)}, DataFetchingEnvironment environment) {
         var lambdaQueryWrapper = JsonToWrapper.toQueryWrapper(queryWrapper, orderBy, environment, ${pascalCase(
