@@ -251,10 +251,10 @@ public class ${className}Resolvers {
 
     // region mutation
     @MutationMapping
-    public String create${className}(@Argument("param") ${className} param) {
+    public ${className} create${className}(@Argument("param") ${className} param) {
         this.${camelCase(className)}Service.save(param);
         ${listCreateColumns}
-        return param.getId();
+        return param;
     }
 
     @MutationMapping
