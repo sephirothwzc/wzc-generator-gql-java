@@ -288,6 +288,16 @@ public class ${className}Resolvers {
     }
 
     @MutationMapping
+    public boolean upsetBatch${className}(@Argument("param") Collection<${className}> param) {
+      return this.${camelCase(className)}Service.saveOrUpdateBatch(param);
+    }
+
+    @MutationMapping
+    public boolean updateBatch${className}(@Argument("param") Collection<${className}> param) {
+      return this.${camelCase(className)}Service.updateBatchById(param);
+    }
+
+    @MutationMapping
     public boolean remove${className}(@Argument("id") String id) {
         return this.${camelCase(className)}Service.removeById(id);
     }
