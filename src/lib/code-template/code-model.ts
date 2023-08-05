@@ -47,7 +47,9 @@ import java.time.LocalDateTime;`);
     case 'tinyint':
       return 'Boolean';
     case 'json':
-      return 'JSON';
+      importList.add(`
+import com.alibaba.fastjson2.JSONObject;`);
+      return 'JSONObject';
     default:
       return 'String';
   }

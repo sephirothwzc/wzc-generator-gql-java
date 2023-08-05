@@ -183,10 +183,10 @@ import java.util.stream.Collectors;`);
       // 主表 主键 Hasmany
       return `
         // ${p.tableComment}
-        if (ArrayUtil.isNotEmpty(param.get${pascalCase(p.tableName)}Array())) {
-            var list = param.get${pascalCase(p.tableName)}Array().stream().map(p -> {
-                p.set${pascalCase(p.columnName)}(param.getId());
-                return p;
+        if (ArrayUtil.isNotEmpty(p.get${pascalCase(p.tableName)}Array())) {
+            var list = p.get${pascalCase(p.tableName)}Array().stream().map(x -> {
+                x.set${pascalCase(p.columnName)}(p.getId());
+                return x;
             }).collect(Collectors.toList());
             this.${camelCase(p.tableName)}Service.saveOrUpdateBatch(list);
         }`;
