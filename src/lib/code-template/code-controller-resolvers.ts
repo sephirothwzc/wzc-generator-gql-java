@@ -18,7 +18,7 @@ const findForeignKey = (
   tableItem: IQueryTableOut,
   keyColumnList: IQueryKeyColumnOut[],
   java?: JavaPage
-): [string, string, string] => {
+): [string, string, string, string] => {
   const injectService = new Set<string>();
   const columns = keyColumnList
     .map((p) => {
@@ -172,11 +172,32 @@ import java.util.stream.Collectors;`);
         }`;
     })
     .join(``);
+
+  const listUpsetColumns = keyColumnList
+    .filter((p) => p.tableName !== tableItem.tableName)
+    .map((p) => {
+      //       importList.add(`
+      // import cn.hutool.core.util.ArrayUtil;`);
+      //       importList.add(`
+      // import java.util.stream.Collectors;`);
+      // 主表 主键 Hasmany
+      return `
+        // ${p.tableComment}
+        if (ArrayUtil.isNotEmpty(param.get${pascalCase(p.tableName)}Array())) {
+            var list = param.get${pascalCase(p.tableName)}Array().stream().map(p -> {
+                p.set${pascalCase(p.columnName)}(param.getId());
+                return p;
+            }).collect(Collectors.toList());
+            this.${camelCase(p.tableName)}Service.saveOrUpdateBatch(list);
+        }`;
+    })
+    .join(``);
   return [
     columns,
     Array.from(injectService).join(`
 `),
     listCreateColumns,
+    listUpsetColumns,
   ];
 };
 
@@ -187,6 +208,7 @@ const modelTemplate = ({
   injectService,
   java,
   listCreateColumns,
+  listUpsetColumns,
 }: {
   className: string;
   filedResolver: string;
@@ -194,6 +216,7 @@ const modelTemplate = ({
   injectService: string;
   java?: JavaPage;
   listCreateColumns: string;
+  listUpsetColumns: string;
 }) => {
   return `package ${java?.packageName}.resolvers;
 
@@ -294,7 +317,11 @@ public class ${className}Resolvers {
 
     @MutationMapping
     public boolean updateBatch${className}(@Argument("param") Collection<${className}> param) {
-      return this.${camelCase(className)}Service.updateBatchById(param);
+      param.stream().forEach(p -> {
+        this.${camelCase(className)}Service.saveOrUpdate(p);
+        ${listUpsetColumns}
+      });
+      return true;
     }
 
     @MutationMapping
@@ -313,7 +340,7 @@ export const send = ({ java, tableItem, keyColumnList }: ISend) => {
   // 初始化清空
   importList.clear();
 
-  const [filedResolver, injectService, listCreateColumns] = findForeignKey(
+  const [filedResolver, injectService, listCreateColumns, listUpsetColumns] = findForeignKey(
     tableItem,
     keyColumnList,
     java
@@ -326,5 +353,6 @@ export const send = ({ java, tableItem, keyColumnList }: ISend) => {
     injectService: injectService,
     java,
     listCreateColumns,
+    listUpsetColumns,
   });
 };

@@ -182,7 +182,7 @@ extend type Mutation {
     upsetWrapper${className}(param:Upset${className}Input!,wrapper: JSON): Boolean
     # 批量插入-${tableComment}
     saveBatch${className}(param:[Save${className}Input!]!): Boolean
-    # 批量保存（有id修改，无id新增）-${tableComment}
+    # 批量保存（有id修改，无id新增）-${tableComment}支持主子表
     upsetBatch${className}(param:[Upset${className}Input!]!): Boolean
     # 批量修改-${tableComment}
     updateBatch${className}(param:[Upset${className}Input!]!): Boolean
