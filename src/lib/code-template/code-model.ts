@@ -48,8 +48,9 @@ import java.time.LocalDateTime;`);
       return 'Boolean';
     case 'json':
       importList.add(`
-import com.alibaba.fastjson2.JSONObject;`);
-      return 'JSONObject';
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.fasterxml.jackson.databind.JsonNode;`);
+      return 'JsonNode';
     default:
       return 'String';
   }
@@ -73,11 +74,15 @@ const findForeignKey = (
       const modelPropertyType = findTypeTxt(p);
       const propertyName = camelCase(p.columnName);
       const comment = p.columnComment || p.columnName;
-
+      let tableField = '';
+      if (propertyName === 'JsonNode') {
+        tableField = `
+	@TableField(typeHandler = JacksonTypeHandler.class)`;
+      }
       return `
     /**
      * ${comment}
-     */
+     */${tableField}
     private ${modelPropertyType} ${propertyName};`;
     })
     .join('');
