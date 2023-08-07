@@ -66,7 +66,8 @@ import com.fasterxml.jackson.databind.JsonNode;`);
 const findForeignKey = (
   columnList: IQueryColumnOut[],
   tableItem: IQueryTableOut,
-  keyColumnList: IQueryKeyColumnOut[]
+  keyColumnList: IQueryKeyColumnOut[],
+  java?: JavaPage
 ): [string, string] => {
   const normalColumns = columnList
     .filter((p) => !notColumn.includes(p.columnName))
@@ -74,6 +75,24 @@ const findForeignKey = (
       const modelPropertyType = findTypeTxt(p);
       const propertyName = camelCase(p.columnName);
       const comment = p.columnComment || p.columnName;
+      // 判断长度
+      let maxValid = '';
+      if (modelPropertyType === 'String') {
+        importList.add(`
+import jakarta.validation.constraints.Max;`);
+        maxValid = `
+  @Max(value = ${p.characterMaximumLength || '50'}, message = "${
+          p.columnComment || ''
+        }长度不能超过${p.characterMaximumLength || '50'}")`;
+      }
+      // 增加非空判断
+      let notNull = '';
+      if (p.isNullable) {
+        importList.add(`
+import ${java?.packageName}${java?.modelPackage}.util.UpsetNotBlankField;`);
+        notNull = `
+	@UpsetNotBlankField`;
+      }
       let tableField = '';
       if (propertyName === 'JsonNode') {
         tableField = `
@@ -82,7 +101,7 @@ const findForeignKey = (
       return `
     /**
      * ${comment}
-     */${tableField}
+     */${tableField}${notNull}${maxValid}
     private ${modelPropertyType} ${propertyName};`;
     })
     .join('');
@@ -149,7 +168,7 @@ export const send = ({ columnList, java, tableItem, keyColumnList }: ISend) => {
   // 初始化清空
   importList.clear();
 
-  const [columns, listCreateColumns] = findForeignKey(columnList, tableItem, keyColumnList);
+  const [columns, listCreateColumns] = findForeignKey(columnList, tableItem, keyColumnList, java);
   return modelTemplate({
     tableName: tableItem.tableName,
     className: pascalCase(tableItem.tableName),
