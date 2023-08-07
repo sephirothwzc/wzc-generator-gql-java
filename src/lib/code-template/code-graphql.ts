@@ -156,7 +156,7 @@ ${columns.replace('id: String!', 'id: String')}${inputOtherColumns}
 }
 
 input Upset${className}Input {
-${columns.replace(/!/g, '')}
+${columns.replace(/!/g, '')}${inputOtherColumns}
 }
 
 
