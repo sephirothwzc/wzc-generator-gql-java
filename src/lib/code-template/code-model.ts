@@ -94,7 +94,7 @@ import ${java?.packageName}${java?.modelPackage}.util.UpsetNotBlankField;`);
 	@UpsetNotBlankField`;
       }
       let tableField = '';
-      if (propertyName === 'JsonNode') {
+      if (modelPropertyType === 'JsonNode') {
         tableField = `
 	@TableField(typeHandler = JacksonTypeHandler.class)`;
       }
