@@ -95,6 +95,8 @@ import ${java?.packageName}${java?.modelPackage}.util.UpsetNotBlankField;`);
       }
       let tableField = '';
       if (modelPropertyType === 'JsonNode') {
+        importList.add(`
+import com.baomidou.mybatisplus.annotation.TableField;`);
         tableField = `
 	@TableField(typeHandler = JacksonTypeHandler.class)`;
       }
