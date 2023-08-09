@@ -83,7 +83,7 @@ const findForeignKey = (
       let maxValid = '';
       if (modelPropertyType === 'String') {
         importList.add(`
-import jakarta.validation.constraints.Max;`);
+import org.hibernate.validator.constraints.Length;`);
         maxValid = `
   @Length(max = ${p.characterMaximumLength || 50}, message = "${p.columnComment || ''}长度不能超过${
           p.characterMaximumLength || '50'
