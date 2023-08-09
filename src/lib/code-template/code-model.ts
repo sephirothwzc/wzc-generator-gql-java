@@ -12,6 +12,10 @@ import { pascalCase } from '../utils/helper';
  * 全局引用需要清空
  */
 const importList = new Set<string>();
+/**
+ * 是否引入
+ */
+let autoResultMap = ''; // ', autoResultMap = true';
 
 const notColumn = [
   'id',
@@ -47,10 +51,10 @@ import java.time.LocalDateTime;`);
     case 'tinyint':
       return 'Boolean';
     case 'json':
+      autoResultMap = ', autoResultMap = true';
       importList.add(`
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.fasterxml.jackson.databind.JsonNode;`);
-      return 'JsonNode';
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;`);
+      return 'Object';
     default:
       return 'String';
   }
@@ -81,20 +85,21 @@ const findForeignKey = (
         importList.add(`
 import jakarta.validation.constraints.Max;`);
         maxValid = `
-  @Max(value = ${p.characterMaximumLength || '50'}, message = "${
-          p.columnComment || ''
-        }长度不能超过${p.characterMaximumLength || '50'}")`;
+  @Length(max = ${p.characterMaximumLength || 50}, message = "${p.columnComment || ''}长度不能超过${
+          p.characterMaximumLength || '50'
+        }")`;
       }
       // 增加非空判断
       let notNull = '';
-      if (p.isNullable) {
+      if (p.isNullable === 'NO') {
         importList.add(`
 import ${java?.packageName}${java?.modelPackage}.util.UpsetNotBlankField;`);
         notNull = `
 	@UpsetNotBlankField`;
       }
       let tableField = '';
-      if (modelPropertyType === 'JsonNode') {
+      if (modelPropertyType === 'Object') {
+        // json
         importList.add(`
 import com.baomidou.mybatisplus.annotation.TableField;`);
         tableField = `
@@ -154,7 +159,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-@TableName("${tableName}")
+@TableName(value = "${tableName}"${autoResultMap})
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -169,6 +174,7 @@ ${listCreateColumns}
 export const send = ({ columnList, java, tableItem, keyColumnList }: ISend) => {
   // 初始化清空
   importList.clear();
+  autoResultMap = '';
 
   const [columns, listCreateColumns] = findForeignKey(columnList, tableItem, keyColumnList, java);
   return modelTemplate({
