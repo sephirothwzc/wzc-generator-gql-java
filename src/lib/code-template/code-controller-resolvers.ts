@@ -280,43 +280,43 @@ public class ${className}Resolvers {
 
     // region mutation
     @MutationMapping
-    public ${className} create${className}(@Argument("param") ${className} param) {
+    public ${className} create${className}(@Validated @Argument("param") ${className} param) {
         this.${camelCase(className)}Service.save(param);
         ${listCreateColumns}
         return param;
     }
 
     @MutationMapping
-    public String save${className}(@Argument("param") ${className} param) {
+    public String save${className}(@Validated @Argument("param") ${className} param) {
         this.${camelCase(className)}Service.save(param);
         return param.getId();
     }
 
     @MutationMapping
-    public ${className} upset${className}(@Argument("param") ${className} param) {
+    public ${className} upset${className}(@Validated @Argument("param") ${className} param) {
         this.${camelCase(className)}Service.saveOrUpdate(param);
         return param;
     }
 
     @MutationMapping
-    public boolean upsetWrapper${className}(@Argument("param") ${className} param, @Argument("wrapper") JsonNode wrapper) {
+    public boolean upsetWrapper${className}(@Validated @Argument("param") ${className} param, @Argument("wrapper") JsonNode wrapper) {
         return this.${camelCase(
           className
         )}Service.saveOrUpdate(param, JsonToWrapper.toQueryWrapper(wrapper, ${className}.class));
     }
 
     @MutationMapping
-    public boolean saveBatch${className}(@Argument("param") Collection<${className}> param) {
+    public boolean saveBatch${className}(@Validated @Argument("param") Collection<${className}> param) {
         return this.${camelCase(className)}Service.saveBatch(param);
     }
 
     @MutationMapping
-    public boolean upsetBatch${className}(@Argument("param") Collection<${className}> param) {
+    public boolean upsetBatch${className}(@Validated @Argument("param") Collection<${className}> param) {
       return this.${camelCase(className)}Service.saveOrUpdateBatch(param);
     }
 
     @MutationMapping
-    public boolean updateBatch${className}(@Argument("param") Collection<${className}> param) {
+    public boolean updateBatch${className}(@Validated @Argument("param") Collection<${className}> param) {
       param.stream().forEach(p -> {
         this.${camelCase(className)}Service.saveOrUpdate(p);
         ${listUpsetColumns}
@@ -325,7 +325,7 @@ public class ${className}Resolvers {
     }
 
     @MutationMapping
-    public boolean remove${className}(@Argument("id") String id) {
+    public boolean remove${className}(@Validated @Argument("id") String id) {
         return this.${camelCase(className)}Service.removeById(id);
     }
     // endregion
