@@ -576,7 +576,7 @@ const queryKeyColumn = async (
   config: ISequelizeConfig,
   name: string
 ): Promise<Array<IQueryKeyColumnOut>> => {
-  const sql = `SELECT C.TABLE_SCHEMA as tableSchema,
+  const sql = `SELECT DISTINCT C.TABLE_SCHEMA as tableSchema,
            C.REFERENCED_TABLE_NAME as referencedTableName,
            C.REFERENCED_COLUMN_NAME as referencedColumnName,
            C.TABLE_NAME as tableName,
@@ -598,7 +598,7 @@ const queryKeyColumn = async (
       WHERE C.REFERENCED_TABLE_NAME IS NOT NULL
 				AND (C.REFERENCED_TABLE_NAME = :tableName or C.TABLE_NAME = :tableName)
         AND C.TABLE_SCHEMA = :database
-        group by C.CONSTRAINT_NAME 
+        -- group by C.CONSTRAINT_NAME 
         order by C.CONSTRAINT_NAME`;
   const sequelize = getConn(config);
   const result = await sequelize.query<IQueryKeyColumnOut>(sql, {
