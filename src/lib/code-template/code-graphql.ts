@@ -169,6 +169,8 @@ extend type Query {
     findCount${className}(queryWrapper: JSON): Long!
     # 分页-${tableComment}
     findPage${className}(findInput:FindInput): Page${className}
+    # 聚合
+    findPolymerization${className}(polymerizationInput: PolymerizationInput): [${className}]
 }
 
 extend type Mutation {

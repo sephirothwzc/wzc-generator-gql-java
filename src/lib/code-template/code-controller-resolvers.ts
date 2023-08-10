@@ -222,6 +222,7 @@ const modelTemplate = ({
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import ${java?.packageName}.graphqlutil.FindInput;
+import ${java?.packageName}.graphqlutil.PolymerizationInput;
 import ${java?.packageName}.graphqlutil.JsonToWrapper;
 import ${java?.packageName}${java?.modelPackage}.model.${className};
 // region import
@@ -275,6 +276,13 @@ public class ${className}Resolvers {
         return this.${camelCase(className)}Service.page(new Page<>(findInput.getCurrent(),
                         findInput.getSize()),
                 JsonToWrapper.toQueryWrapper(findInput.getQueryWrapper(), findInput.getOrderBy(), environment, ${className}.class));
+    }
+
+    @QueryMapping
+    public Iterable<${className}> findPolymerization${className}(@Argument("polymerizationInput") PolymerizationInput polymerizationInput){
+      return this.${camelCase(
+        className
+      )}Service.list(polymerizationInput.findPolymerization(${className}.class));
     }
     // endregion
 
