@@ -320,16 +320,16 @@ public class ${className}Resolvers {
 
     @MutationMapping
     public boolean upsetBatch${className}(@Validated @Argument("param") Collection<${className}> param) {
-      return this.${camelCase(className)}Service.saveOrUpdateBatch(param);
-    }
-
-    @MutationMapping
-    public boolean updateBatch${className}(@Validated @Argument("param") Collection<${className}> param) {
       param.stream().forEach(p -> {
         this.${camelCase(className)}Service.saveOrUpdate(p);
         ${listUpsetColumns}
       });
       return true;
+    }
+
+    @MutationMapping
+    public boolean updateBatch${className}(@Validated @Argument("param") Collection<${className}> param) {
+      return this.${camelCase(className)}Service.saveOrUpdateBatch(param);
     }
 
     @MutationMapping

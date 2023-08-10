@@ -1,6 +1,6 @@
 {
   "name": "wzc-generator-gql-java",
-  "version": "1.0.62",
+  "version": "1.0.63",
   "description": "代码生成器",
   "main": "index.js",
   "scripts": {
