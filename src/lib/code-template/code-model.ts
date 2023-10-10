@@ -6,7 +6,7 @@ import {
   ISend,
   JavaPage,
 } from '../code-generator';
-import { pascalCase } from '../utils/helper';
+import { camelCaseNumber, pascalCase } from '../utils/helper';
 
 /**
  * 全局引用需要清空
@@ -77,7 +77,7 @@ const findForeignKey = (
     .filter((p) => !notColumn.includes(p.columnName))
     .map((p) => {
       const modelPropertyType = findTypeTxt(p);
-      const propertyName = camelCase(p.columnName);
+      const propertyName = camelCaseNumber(p.columnName);
       const comment = p.columnComment || p.columnName;
       // 判断长度
       let maxValid = '';

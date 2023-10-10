@@ -1,6 +1,6 @@
 import { camelCase } from 'lodash';
 import { IQueryColumnOut, IQueryKeyColumnOut, IQueryTableOut, ISend } from '../code-generator';
-import { pascalCase } from '../utils/helper';
+import { camelCaseNumber, pascalCase } from '../utils/helper';
 
 const notColumn = [
   // 'id',
@@ -100,7 +100,7 @@ const findForeignKey = (
     .filter((p) => !notColumn.includes(p.columnName))
     .map((p) => {
       const gqlType = findTypeTxt(p);
-      const propertyName = camelCase(p.columnName);
+      const propertyName = camelCaseNumber(p.columnName);
       const comment = p.columnComment || p.columnName;
 
       const gqlNullable = p.isNullable === 'YES' ? '' : '!';
