@@ -1,4 +1,4 @@
-import { camelCase, isNumber, upperFirst } from 'lodash';
+import { camelCase, isNumber, toNumber, upperFirst } from 'lodash';
 
 /**
  * 帕斯卡命名
@@ -18,14 +18,14 @@ export const camelCaseNumber = (name: string) => {
       if (index === 0) {
         return camelCase(p);
       }
-      if (isNumber(p)) {
+      if (isNumber(toNumber(p))) {
         let t = `_${p}`;
         if (index === nameList.length - 1) {
           t += '_';
         }
         return t;
       }
-      return upperFirst(camelCase(name));
+      return upperFirst(camelCase(p));
     })
     .join('');
   return newName;
